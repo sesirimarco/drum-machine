@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
@@ -18,32 +18,34 @@ import {
 	BANK_TWO 
 } from "./banks";
 
-const Pad = ({id, keyTrigger, url, volume, onPlay }) => {
-	const [audio, setAudio] = React.useState(null);
-	
+const Pad = ({id, keyTrigger, currentKey, url, volume, onPlay }) => {
 	const [isPlaying, setIsPlaying] = React.useState(false);
-	console.log('PAD volume ', volume)
+	const audioRef = useRef(null);
 	React.useEffect(() => {
-		const audio = document.getElementById(keyTrigger);
-		setAudio(audio);
-		
-		audio.addEventListener('ended', (e) => {
+		audioRef.current.addEventListener('ended', (e) => {
 			setIsPlaying(false);
 		});
-		const handlerKeyDown = (e) => {
+		/*const handlerKeyDown = (e) => {
 			handlePlayAudio(e.key);
 		};
-		
-		
-		
-		
 		document.addEventListener('keydown', handlerKeyDown)
 		return () => {
 			document.removeEventListener('keydown', handlerKeyDown);
-		};
-	}, [audio, volume]);
+		};*/
+	}, []);
+	useEffect(() => {
+		console.log('PAD currentKey' , currentKey)
+		if(currentKey) {
+			handlePlayAudio(currentKey);
+		}
+	}, [currentKey]);
+	
+	useEffect(() => {
+		audioRef.current.volume = volume;
+	}, [volume]);
 
 	const handlePlayAudio = (key) => {
+		console.log(key, keyTrigger)
 		if(key && key.toUpperCase() === keyTrigger){
 			playAudio();
 		} else if (!key) {
@@ -51,8 +53,7 @@ const Pad = ({id, keyTrigger, url, volume, onPlay }) => {
 		}
 	};
 	const playAudio = () => {
-		console.log('Pad  playAudio volume' , volume)
-		audio.volume = volume;
+		const audio = audioRef.current;
 		audio.currentTime = 0;
 		audio.play();
 		setIsPlaying(true);
@@ -68,10 +69,12 @@ const Pad = ({id, keyTrigger, url, volume, onPlay }) => {
 		>
             <Button 
 				variant={`outline-dark ${isPlaying ? 'active' : ''} p-4 m-2`}
+				
 			>
 				{keyTrigger}
 			</Button>
 			<audio 
+				ref={audioRef}
 				src={url} 
 				className="clip" 
 				id={keyTrigger}
@@ -80,17 +83,17 @@ const Pad = ({id, keyTrigger, url, volume, onPlay }) => {
     );
 };
 
-const DrumMachine = ({ volume, onPlay, currentBank }) => {
+const DrumMachine = ({ volume, onPlay, currentBank, currentKey }) => {
     const banks = matrixSamples(currentBank);
-    console.log("Drume machine volume: ", volume);
     return (
         <div id="drum-machine">
             {banks.map((row, index) => (
                 <Row key={index}>
                     {row.map(({ id, keyCode, keyTrigger, url }) => (
-                        <Col xs="3" md="3" key={id}>
+                        <Col xs="4" sm="4" md="3" key={id}>
                             <Pad
-                                id={id}
+								id={id}
+								currentKey={currentKey}
                                 keyCode={keyCode}
                                 keyTrigger={keyTrigger}
                                 url={url}
@@ -147,7 +150,7 @@ const Controls = ({currentSampleLabel, onBankChange, onVolumeChange}) => {
 			</ButtonGroup>
 			<Form>
 				<Form.Group controlId="formBasicRangeCustom">
-					<Form.Label>Vol</Form.Label>
+					<br/>
 					<Form.Control 
 						type="range" 
 						value={rangeValue}
@@ -163,27 +166,40 @@ const App = () => {
 	const [currentSampleLabel, setCurrentSampleLabel] = React.useState('');
 	const [currentBank, setCurrentBank] = React.useState(BANK_ONE);
 	const [currentVolume, setVolume] = React.useState(INIT_VOLUME / 100);
+	const [currentKey, setCurrentKey] = React.useState(null);
 	const handlerBankChange = (valueBank) => {
 		setCurrentBank(valueBank);
 	};
 	const handleVolumeChange = (volume) => {
 		setVolume(volume);
 	};
+	useEffect(() => {
+		const handlerKeyDown = ({key}) => {
+			console.log('key: ', key)
+			setCurrentKey(key);
+			setCurrentKey(null);
+		};
+		document.addEventListener('keydown', handlerKeyDown)
+		return () => {
+			document.removeEventListener('keydown', handlerKeyDown);
+		};
+	}, []);
 	return(
-		<Container >
+		<Container style={{minWidth:300}}>
 			<h1>Drum Machine</h1>
-			<Jumbotron >
+			<Jumbotron>
 				<Row>
-					<Col>
+					<Col xs="12" sm="6" md="6" >
 						<DrumMachine  
 							volume={currentVolume} 
+							currentKey={currentKey} 
 							onPlay={(id) => {
 								setCurrentSampleLabel(id);
 							}}
 							currentBank={banks[currentBank]}
 						/>
 					</Col>	
-					<Col>
+					<Col xs="12" sm="4" md="4" className="ml-2 pt-2">
 						<Controls 
 							currentSampleLabel={currentSampleLabel || 'Sample'}
 							onBankChange={handlerBankChange}
