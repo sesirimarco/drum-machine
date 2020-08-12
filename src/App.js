@@ -1,17 +1,17 @@
-import React from "react";
+import React from 'react';
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Jumbotron from "react-bootstrap/Jumbotron";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import ToggleButton from "react-bootstrap/ToggleButton";
-import Alert from "react-bootstrap/Alert";
-import Form from "react-bootstrap/Form";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+import Jumbotron from 'react-bootstrap/Jumbotron';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import Alert from 'react-bootstrap/Alert';
+import Form from 'react-bootstrap/Form';
 
-import { matrixSamples, banks, BANK_ONE, BANK_TWO } from "./banks";
+import { matrixSamples, banks, BANK_ONE, BANK_TWO } from './banks';
 
 const INIT_VOLUME = 0.5;
 const LOCAL_STORAGE_VOL = 'currentVol';
@@ -50,7 +50,6 @@ const Pad = ({ id, keyTrigger, currentKey, url, volume, onPlay }) => {
         setIsPlaying(true);
         onPlay(id);
 	};
-	console.log(1)
     return (
         <div
             className="drum-pad"
@@ -82,7 +81,7 @@ const DrumMachine = ({ volume, onPlay, currentBank, currentKey }) => {
             {banks.map((row, index) => (
                 <Row key={index}>
                     {row.map(({ id, keyCode, keyTrigger, url }) => (
-                        <Col xs="4" sm="4" md="3" key={id}>
+                        <Col xs="3" sm="4" md="4" key={id}>
                             <Pad
                                 id={id}
                                 currentKey={currentKey}
@@ -146,9 +145,7 @@ const VolumeRange = ({ onVolumeChange, currentVolume }) => {
 		onVolumeChange(value / 100);
     };
     React.useEffect(() => {
-		//const newVol = localStorage.getItem(LOCAL_STORAGE_VOL) || INIT_VOLUME;
-		console.log('currentVolume ', currentVolume)
-        setRangeValue(currentVolume * 100);
+		setRangeValue(currentVolume * 100);
     }, [currentVolume]);
 
     return (
@@ -219,7 +216,7 @@ const App = () => {
 	}, []);
 	
     return (
-        <Container style={{ minWidth: 300 }}>
+        <Container style={{ minWidth: 300, maxWidth: 700 }}>
             <Jumbotron className="mt-4">
 				<Row>
 					<Col className="text-center pb-4">
