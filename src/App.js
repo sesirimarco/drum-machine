@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
@@ -18,21 +18,21 @@ const LOCAL_STORAGE_VOL = 'currentVol';
 const LOCAL_STORAGE_CURRENT_BANK = 'currentBank';
 
 const Pad = ({ id, keyTrigger, currentKey, url, volume, onPlay }) => {
-    const [isPlaying, setIsPlaying] = React.useState(false);
-    const audioRef = React.useRef(null);
-    React.useEffect(() => {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef(null);
+    useEffect(() => {
         audioRef.current.addEventListener('ended', (e) => {
             setIsPlaying(false);
         });
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (currentKey) {
             handlePlayAudio(currentKey.newKeyPress);
         }
     }, [currentKey]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         audioRef.current.volume = volume;
     }, [volume]);
 
@@ -106,7 +106,7 @@ const Display = ({ currentSampleLabel }) => {
     );
 };
 const Banks = ({ onBankChange, currentBank }) => {
-    const [radioValue, setRadioValue] = React.useState(currentBank);
+    const [radioValue, setRadioValue] = useState(currentBank);
     const radios = [
         { name: "Bank 1", value: BANK_ONE },
         { name: "Bank 2", value: BANK_TWO },
@@ -115,7 +115,7 @@ const Banks = ({ onBankChange, currentBank }) => {
         setRadioValue(bank);
         onBankChange(bank);
 	};
-	React.useEffect(() => {
+	useEffect(() => {
 		setRadioValue(currentBank);
 	}, [currentBank]);
 	
@@ -138,13 +138,13 @@ const Banks = ({ onBankChange, currentBank }) => {
     );
 };
 const VolumeRange = ({ onVolumeChange, currentVolume }) => {
-    const [rangeValue, setRangeValue] = React.useState(INIT_VOLUME);
+    const [rangeValue, setRangeValue] = useState(INIT_VOLUME);
 
     const handleRange = (value) => {
 		setRangeValue(value);
 		onVolumeChange(value / 100);
     };
-    React.useEffect(() => {
+    useEffect(() => {
 		setRangeValue(currentVolume * 100);
     }, [currentVolume]);
 
@@ -185,10 +185,10 @@ const Controls = ({
     );
 };
 const App = () => {
-    const [currentSampleLabel, setCurrentSampleLabel] = React.useState('');
-    const [currentBank, setCurrentBank] = React.useState(BANK_ONE);
-    const [currentVolume, setVolume] = React.useState(INIT_VOLUME);
-	const [currentKey, setCurrentKey] = React.useState(null);
+    const [currentSampleLabel, setCurrentSampleLabel] = useState('');
+    const [currentBank, setCurrentBank] = useState(BANK_ONE);
+    const [currentVolume, setVolume] = useState(INIT_VOLUME);
+	const [currentKey, setCurrentKey] = useState(null);
 	
     const handlerBankChange = (valueBank) => {
 		localStorage.setItem(LOCAL_STORAGE_CURRENT_BANK, valueBank)
@@ -198,7 +198,7 @@ const App = () => {
         setVolume(volume);
         localStorage.setItem(LOCAL_STORAGE_VOL, volume);
     };
-    React.useEffect(() => {
+    useEffect(() => {
         setVolume(
 			localStorage.getItem(LOCAL_STORAGE_VOL) || currentVolume
 		);
